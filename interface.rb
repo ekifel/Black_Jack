@@ -17,9 +17,9 @@ class Interface
       @game.new_round
       user_step
       @game.dealer_step
+      show_round_result
       show_dealer_stat
       user_stat
-      @game.round_result
       unless @game.can_continue?
         show_winner
         break
@@ -31,6 +31,12 @@ class Interface
     end
   end
 
+  def show_round_result
+    puts '********************************'
+    @game.round_result
+    puts '********************************'
+  end
+
   def show_winner
     if @game.user.bank.zero?
       puts 'Game over. Вы банкрот'
@@ -39,13 +45,13 @@ class Interface
   end
 
   def show_dealer_stat
-    puts "Карты дилера: #{@game.dealer.cards}, Счет: #{game.dealer.score}," \
-    "Банк: #{@game.dealer.bank}}"
+    @game.dealer.hand.show_cards(@game.dealer)
+    puts "Банк дилера: #{@game.dealer.bank}"
   end
 
   def user_stat
-    puts "Ваши карты: #{@game.user.cards}, Счет: #{@game.user.score}," \
-    "Банк: #{@game.user.bank}"
+    @game.user.hand.show_cards(@game.user)
+    puts "Ваш банк: #{@game.user.bank}"
   end
 
   def user_step
@@ -55,6 +61,5 @@ class Interface
     puts '1. Взять карту; 2. Открыться'
     user_answer = gets.chomp.to_i
     @game.add_card(@game.user) if user_answer == 1
-    @game.user.recount
   end
 end

@@ -4,7 +4,7 @@ require_relative 'user'
 require_relative 'deck'
 
 class Game
-  attr_reader :user, :dealer, :deck, :card_index, :shuffle_deck, :bank
+  attr_reader :user, :dealer, :deck, :card_index, :bank
 
   BET = 10
 
@@ -15,7 +15,7 @@ class Game
   end
 
   def new_round
-    @shuffle_deck = deck.shuffle_deck
+    @deck.shuffle
     @card_index = 0
     @user.refresh
     @dealer.refresh
@@ -42,20 +42,19 @@ class Game
   def add_card(player)
     return unless can_add_card?(player)
 
-    player.cards << @shuffle_deck[@card_index]
-    player.score += @deck.card_value(@shuffle_deck[@card_index])
+    player.hand.cards << @deck.cards[@card_index]
+    player.hand.count_the_score
     @card_index += 1
   end
 
   def dealer_step
-    return unless @dealer.score < 17
+    return unless @dealer.hand.score < 17
 
     add_card(@dealer)
-    @dealer.recount
   end
 
   def can_add_card?(player)
-    player.cards.size < 3 && player.score <= 20
+    player.hand.cards.size < 3 && player.hand.score <= 20
   end
 
   def round_result
@@ -71,11 +70,11 @@ class Game
   end
 
   def round_winner
-    if ((@user.score > @dealer.score) && @user.score <= 21) ||
-       (@dealer.score > 21 && @user.score <= 21)
+    if ((@user.hand.score > @dealer.hand.score) && @user.hand.score <= 21) ||
+       (@dealer.hand.score > 21 && @user.hand.score <= 21)
       @user
-    elsif ((@dealer.score > @user.score) && @dealer.score <= 21) ||
-          (@dealer.score <= 21 && @user.score > 21)
+    elsif ((@dealer.hand.score > @user.hand.score) && @dealer.hand.score <= 21) ||
+          (@dealer.hand.score <= 21 && @user.hand.score > 21)
       @dealer
     else
       false
